@@ -2,6 +2,7 @@
 
 ```elixir
 Mix.install([
+  {:kino, "~> 0.7.0", override: true},
   {:youtube, github: "brooklinjazz/youtube"},
   {:hidden_cell, github: "brooklinjazz/hidden_cell"}
 ])
@@ -52,8 +53,6 @@ defmodule TodoList do
   @moduledoc """
   Documentation for `TodoList`
   """
-  @storage "todolist"
-
   @doc """
   Retrieve the persistent todo list.
 
