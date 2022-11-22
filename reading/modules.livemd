@@ -105,7 +105,13 @@ end
 </details>
 
 ```elixir
+defmodule Math do
+  def add(num1, num2) do
+    num1 + num2
+  end
+end
 
+Math.add(1, 3)
 ```
 
 ## Internal Module Functions
@@ -134,12 +140,17 @@ defmodule InspectorGadget do
     "Go go gadget #{gadget}!"
   end
 
+  def arms do
+    gogo("arms")
+  end
+
   def necktie do
     gogo("necktie")
   end
 end
 
 InspectorGadget.necktie()
+InspectorGadget.arms()
 ```
 
 However, we must include the module name when using the module's function outside of the module. For example, the following will raise an error.
@@ -337,7 +348,11 @@ end
 Enter your solution below.
 
 ```elixir
-
+defmodule Languages.Dutch do
+  def greeting do
+    "Hallo"
+  end
+end
 ```
 
 ### Nested Modules
