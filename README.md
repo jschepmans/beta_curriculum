@@ -224,19 +224,18 @@ The curriculum is still a rough outline subject to change and feedback. see [sta
 * HTML and CSS
 * APIs & Parsing JSON
 * Phoenix
-* Data Validation
-* Relational Database Management Systems and Ecto
+* Tailwind
+* Forms and Validation
 * Phoenix and Ecto
-* Phoenix Authentication
 * Testing Phoenix
+* Schemas and Migrations
+* Phoenix Authentication
 * Phoenix and Ecto One-to-Many Relationships
 * Phoenix and Ecto Many-to-Many Relationships
 * Phoenix and Ecto One-to-One Relationships
-* Tailwind
 ## LiveView
 * LiveView
 * Testing LiveView
-* Phoenix Forms
 * PubSub and Channels
 * GraphQL and Absinthe
 ## Capstone Project Preparation
