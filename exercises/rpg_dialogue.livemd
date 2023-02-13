@@ -82,7 +82,9 @@ defmodule Character do
   iex> %Character{name: "Frodo"}
   ** (ArgumentError) the following keys must also be given when building struct Character: [:name]
   """
-  defstruct []
+  @enforce_keys [:name]
+  @optional_keys [:class, :weapon]
+  defstruct @enforce_keys ++ @optional_keys
 
   @doc """
   Introduce the character by name.
@@ -96,6 +98,7 @@ defmodule Character do
     "My name is Aragorn."
   """
   def introduce(character) do
+    "My name is #{character.name}."
   end
 
   @doc """
@@ -110,6 +113,10 @@ defmodule Character do
     "I attack with my sword!"
   """
   def attack(character) do
+    case character do
+      %Character{name: _, weapon: nil, class: _} -> "I attack!"
+      %Character{name: _, weapon: _, class: _} -> "I attack with my #{character.weapon}!"
+    end
   end
 
   @doc """
@@ -124,6 +131,10 @@ defmodule Character do
     "I am a ranger."
   """
   def class(character) do
+    case character do
+      %Character{name: _, weapon: _, class: nil} -> "My class is unknown!"
+      %Character{name: _, weapon: _, class: _} -> "I am a #{character.class}."
+    end
   end
 
   @doc """
@@ -138,6 +149,13 @@ defmodule Character do
     "My name is Aragorn and I am a ranger!"
   """
   def war_cry(character) do
+    case character do
+      %Character{name: _, weapon: _, class: nil} ->
+        "My name is #{character.name} and my class is unknown!"
+
+      %Character{name: _, weapon: _, class: _} ->
+        "My name is #{character.name} and I am a #{character.class}!"
+    end
   end
 
   @doc """
@@ -152,6 +170,13 @@ defmodule Character do
     "My name is Aragorn and I have defeated the warrior Gimli!"
   """
   def defeat(character1, character2) do
+    case character2 do
+      %Character{name: _, weapon: _, class: nil} ->
+        "My name is #{character1.name} and I have defeated the classless #{character2.name}!"
+
+      %Character{name: _, weapon: _, class: _} ->
+        "My name is #{character1.name} and I have defeated the #{character2.class} #{character2.name}!"
+    end
   end
 end
 ```
@@ -198,7 +223,25 @@ Character.introduce(aragorn)
 Enter your solution below.
 
 ```elixir
+aragon = %Character{name: "Aragorn", class: "ranger", weapon: "sword"}
+gandalf = %Character{name: "Gandalf", class: "wizard", weapon: "staff"}
+gimli = %Character{name: "Gimli", class: "warrior", weapon: "axe"}
 
+IO.puts(Character.introduce(gandalf))
+IO.puts(Character.defeat(aragon, gimli))
+IO.puts(Character.class(aragon))
+IO.puts(Character.war_cry(gimli))
+IO.puts(Character.attack(gandalf))
+
+aragon = %Character{name: "Aragorn"}
+gandalf = %Character{name: "Gandalf"}
+gimli = %Character{name: "Gimli"}
+
+IO.puts(Character.introduce(gandalf))
+IO.puts(Character.defeat(aragon, gimli))
+IO.puts(Character.class(aragon))
+IO.puts(Character.war_cry(gimli))
+IO.puts(Character.attack(gandalf))
 ```
 
 ### Bonus: Handle `nil` Fields.
@@ -223,7 +266,7 @@ You have complete creative control over how you would like to change the dialogu
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rpg_dialogue_reading\"\n    \"exercises\" -> \"rpg_dialogue_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rpg_dialogue_reading\"\n    \"exercises\" -> \"rpg_dialogue_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
