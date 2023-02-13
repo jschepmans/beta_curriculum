@@ -79,6 +79,8 @@ maze = %{
     }
   }
 }
+
+maze.south.west.south.east.south.east.south
 ```
 
 ## The String Maze
@@ -140,6 +142,8 @@ maze = %{
     }
   }
 }
+
+maze["south"]["east"]["south"]["west"]["south"]["west"]["south"]["east"]["south"]
 ```
 
 ## Bonus: Treasure Map
@@ -185,6 +189,8 @@ treasure_map = %{
     }
   }
 }
+
+treasure_map["south ten paces"][10]."east three paces"[[1, 2, 3]][{"turn", "right"}].dig
 ```
 
 ### (Extra Bonus) Update the Treasure Map
@@ -255,6 +261,22 @@ treasure_map = %{
     }
   }
 }
+
+
+treasure_map = %{
+  treasure_map
+  | "south ten paces" => %{
+      10 => %{
+        :"east three paces" => %{
+          [1, 2, 3] => %{
+            {"turn", "right"} => %{
+              :dig => "taken"
+            }
+          }
+        }
+      }
+    }
+}
 ```
 
 ## Bonus: Pattern Matching
@@ -262,7 +284,26 @@ treasure_map = %{
 Use pattern matching to bind the `"Exit!"` string to an `exit` variable.
 
 ```elixir
-maze = %{
+maze =
+  %{
+    "south" => %{
+      "east" => %{
+        "south" => %{
+          "west" => %{
+            "south" => %{
+              "west" => %{
+                "south" => %{
+                  "east" => %{
+                    "south" => exit
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } = %{
   "south" => %{
     "east" => %{
       "south" => %{
@@ -281,6 +322,8 @@ maze = %{
     }
   }
 }
+
+exit
 ```
 
 ## BONUS: Create Your Own Maze
@@ -294,12 +337,36 @@ at least a 5 * 5 in width and height.
 Enter your solution below.
 
 ```elixir
+maze = %{
+  :south => %{
+    :east => %{
+      :south => %{
+        :west => %{
+          :south => %{
+            :east => %{
+              :south => %{
+                :west => %{
+                  :north => %{
+                    :west => %{
+                      :south => "Exit!"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
+maze.south.east.south.west.south.east.south.west.north.west.south
 ```
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"mazes_reading\"\n    \"exercises\" -> \"mazes_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"mazes_reading\"\n    \"exercises\" -> \"mazes_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
