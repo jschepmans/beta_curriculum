@@ -156,6 +156,7 @@ defmodule SafeRange do
     []
   """
   def range(first, last, step \\ DEFAULT) do
+    make_range([first, last], step, :unsafe)
   end
 
   @doc """
@@ -180,6 +181,56 @@ defmodule SafeRange do
     ** (RuntimeError) Invalid step value of: 1
   """
   def range!(first, last, step \\ DEFAULT) do
+    make_range([first, last], step, :safe)
+  end
+
+  defp make_range(range_list, step, safety) do
+    [first, last] = [Enum.at(range_list, 0), Enum.at(range_list, -1)]
+
+    cond do
+      step == 0 ->
+        []
+
+      # ex. [3,1,1] should result in []
+      first > last ->
+        case safety do
+          :safe -> raise "Invalid step value of: #{step}"
+          :unsafe -> []
+        end
+
+      # ex. [1,1,1] should result in [1,1]
+      first == last ->
+        [first]
+
+      # step will go outside the range, ex. [1, 2, -1]
+      last - first < last - (first + step) ->
+        case safety do
+          :safe -> raise "Invalid step value of: #{step}"
+          :unsafe -> []
+        end
+
+      # [1, 2, 2] should give [1]
+      step > Enum.at(range_list, 1) - first ->
+        [first]
+
+      # range has been fully built and we can return the final list
+      Enum.at(range_list, -2) == Enum.at(range_list, -1) - step ->
+        range_list
+
+      # still building the range with recursion
+      first < last ->
+        temp_list = Enum.drop(range_list, -1)
+        new_list = temp_list ++ [Enum.at(temp_list, -1) + step] ++ [Enum.at(range_list, -1)]
+        IO.inspect(new_list)
+
+        new_list =
+          cond do
+            Enum.at(new_list, -1) - Enum.at(new_list, -2) < step -> Enum.drop(new_list, -1)
+            true -> new_list
+          end
+
+        make_range(new_list, step, safety)
+    end
   end
 end
 ```
@@ -208,7 +259,7 @@ end
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"saferange_reading\"\n    \"exercises\" -> \"saferange_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"saferange_reading\"\n    \"exercises\" -> \"saferange_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
