@@ -222,7 +222,9 @@ each generator creates another nested loop and therefore has a significant perfo
 In the Elixir cell below, use a comprehension with a generator of `1..50` to create a list of even integers from `2` to `100`.
 
 ```elixir
-
+for n <- 1..50 do
+  n * 2
+end
 ```
 
 ## Filters
@@ -315,7 +317,9 @@ end
 </details>
 
 ```elixir
-
+for a <- 1..7, b <- 1..7, c <- 1..7, a + b + c == 7 do
+  {a, b, c}
+end
 ```
 
 ## Collectables
@@ -394,7 +398,9 @@ end
 </details>
 
 ```elixir
-
+for {letter, number} <- %{a: 1, b: 2}, into: %{} do
+  {"#{letter}", number}
+end
 ```
 
 ## Why Use A Comprehension?
@@ -418,7 +424,9 @@ Enum.map(1..5, fn each -> each * 2 end)
 ```
 
 ```elixir
-
+for n <- 1..5 do
+  n * 2
+end
 ```
 
 In the Elixir cell below, convert the following `Enum.reduce` into a comprehension.
@@ -430,7 +438,9 @@ Enum.reduce(["a", "b", "c"], fn each, acc -> acc <> each end)
 ```
 
 ```elixir
-
+for n <- ["a", "b", "c"], into: "" do
+  n
+end
 ```
 
 In the Elixir cell below, convert the following nested `Enum.map` into a comprehension.
@@ -442,12 +452,14 @@ Enum.map(1..3, fn a -> Enum.map(1..3, fn b -> {a, b} end) end)
 ```
 
 ```elixir
-
+for a <- [1..3], b <- [1..3] do
+  {a, b}
+end
 ```
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"comprehensions_reading\"\n    \"exercises\" -> \"comprehensions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"comprehensions_reading\"\n    \"exercises\" -> \"comprehensions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
