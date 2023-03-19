@@ -154,6 +154,11 @@ defmodule TicTacToe do
     "C"
   """
   def at(board, coordinate) do
+    x_index = elem(coordinate, 0)
+    y_index = elem(coordinate, 1)
+    y_row = Enum.at(board, -(y_index + 1))
+
+    Enum.at(y_row, x_index)
   end
 
   @doc """
@@ -177,6 +182,90 @@ defmodule TicTacToe do
   [[nil, "X", "O"], [nil, "X", "O"],[nil, nil, "X"]]
   """
   def fill(board, coordinate, symbol) do
+    x_index = elem(coordinate, 0)
+    y_index = elem(coordinate, 1)
+    y_row = Enum.at(board, -(y_index + 1))
+
+    new_y_row = List.update_at(y_row, x_index, fn _ -> symbol end)
+    List.update_at(board, -(y_index + 1), fn _ -> new_y_row end)
+  end
+
+  @doc """
+  Determine if a player has won the game.
+
+  ## Examples
+
+  Row Wins:
+
+  iex> TicTacToe.winner([["X", "X", "X"], [nil, nil, nil], [nil, nil, nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, nil], ["X", "X", "X"], [nil, nil, nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], ["X", "X", "X"]])
+  "X"
+
+  Column Wins:
+
+  iex> TicTacToe.winner([["X", nil, nil], ["X", nil, nil], ["X", nil, nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, "X", nil]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, "X"], [nil, nil, "X"], [nil, nil, "X"]])
+  "X"
+
+  Diagonal Wins
+
+  iex> TicTacToe.winner([["X", nil, nil], [nil, "X", nil], [nil, nil, "X"]])
+  "X"
+  iex> TicTacToe.winner([[nil, nil, "X"], [nil, "X", nil], ["X", nil, nil]])
+  "X"
+
+  No Winner
+
+  iex> TicTacToe.winner([[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]])
+  nil
+  iex> TicTacToe.winner([[nil, "X", nil], [nil, "X", nil], [nil, nil, nil]])
+  nil
+
+  """
+  def winner(board) do
+    cond do
+      row_win = row_win(board) -> row_win
+      column_win = column_win(board) -> column_win
+      diagonal_win = diagonal_win(board) -> diagonal_win
+      true -> nil
+    end
+  end
+
+  defp row_win(board) do
+    find_winner(board)
+  end
+
+  defp column_win(board) do
+    board
+    |> Enum.zip()
+    |> Enum.map(fn tuple -> Tuple.to_list(tuple) end)
+    |> find_winner()
+  end
+
+  defp diagonal_win(board) do
+    [[top_left, _, top_right], [_, centre, _], [bottom_left, _, bottom_right]] = board
+    diagonals = [[top_left, centre, bottom_right], [top_right, centre, bottom_left]]
+    find_winner(diagonals)
+  end
+
+  defp find_winner(rows) do
+    row =
+      rows
+      |> Enum.filter(fn row ->
+        Enum.all?(row, &(&1 == "X")) or Enum.all?(row, &(&1 == "O"))
+      end)
+      |> List.first()
+
+    case row do
+      [winner, _, _] -> winner
+      _ -> nil
+    end
   end
 end
 ```
@@ -319,7 +408,7 @@ end
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"tic-tac-toe_reading\"\n    \"exercises\" -> \"tic-tac-toe_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"tic-tac-toe_reading\"\n    \"exercises\" -> \"tic-tac-toe_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
