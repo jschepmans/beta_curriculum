@@ -74,6 +74,7 @@ defmodule TimeConverter do
 
   """
   def to_seconds(amount, unit) do
+    amount * seconds_in_one_unit(unit)
   end
 
   @doc """
@@ -96,13 +97,23 @@ defmodule TimeConverter do
 
   """
   def from_seconds(amount, unit) do
+    amount / seconds_in_one_unit(unit)
+  end
+
+  defp seconds_in_one_unit(unit) do
+    case unit do
+      :days -> DateTime.diff(~U[0000-01-02 00:00:00Z], ~U[0000-01-01 00:00:00Z], :second)
+      :hours -> DateTime.diff(~U[0000-01-01 01:00:00Z], ~U[0000-01-01 00:00:00Z], :second)
+      :minutes -> DateTime.diff(~U[0000-01-01 00:01:00Z], ~U[0000-01-01 00:00:00Z], :second)
+      :seconds -> DateTime.diff(~U[0000-01-01 00:00:01Z], ~U[0000-01-01 00:00:00Z], :second)
+    end
   end
 end
 ```
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"time_converting_reading\"\n    \"exercises\" -> \"time_converting_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"time_converting_reading\"\n    \"exercises\" -> \"time_converting_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
