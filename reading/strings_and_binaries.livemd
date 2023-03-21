@@ -69,7 +69,7 @@ the left when it reaches `10` in base 10 or `2` in base 2.
 
 Here's a table of binary numbers and their corresponding integer values.
 
-<!-- livebook:{"attrs":{"source":"Enum.map(1..300, fn integer ->\n  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()\n  %{base10: integer, base2: binary}\nend) |> Kino.DataTable.new()","title":"Base2 Conversion Table"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"Enum.map(1..300, fn integer ->\n  binary = Integer.digits(integer, 2) |> Enum.join() |> String.to_integer()\n  %{base10: integer, base2: binary}\nend) |> Kino.DataTable.new()","title":"Base2 Conversion Table"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 Enum.map(1..300, fn integer ->
@@ -105,7 +105,7 @@ We've already seen we can find the code point of a character using `?` in Elixir
 Here we can see a table of alphabetical characters and their code points. Notice that capital letters and
 lowercase letters have different code points.
 
-<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend) |> Kino.DataTable.new()","title":"Code Points"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"\n|> String.codepoints()\n|> Enum.map(fn char ->\n  <<code_point::utf8>> = char\n  %{character: char, code_point: code_point}\nend) |> Kino.DataTable.new()","title":"Code Points"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -218,13 +218,13 @@ String.graphemes("é")
 Use [String.graphemes/1](https://hexdocs.pm/elixir/String.html#graphemes/1) to convert the [woman fire fighter](https://emojipedia.org/woman-firefighter/) emoji 👩‍🚒 to a list of graphemes.
 
 ```elixir
-
+String.graphemes("👩‍🚒")
 ```
 
 Use [String.codepoints/1](https://hexdocs.pm/elixir/String.html#codepoints/1) to convert the emoji 👩‍🚒 into a list of codepoints. You'll notice it's actually a combination of the 👩 and 🚒 emojis.
 
 ```elixir
-
+String.codepoints("👩‍🚒")
 ```
 
 ## Hexadecimal
@@ -239,7 +239,7 @@ sixteen symbols (0-9 a-f).
 
 Hexadecimal uses decimal symbols from `1` to `9`. Then switches to using the letters `a` to `f` as you can see in the following table.
 
-<!-- livebook:{"attrs":{"source":"\"0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f\"\n|> String.split(\",\")\n|> Enum.with_index()\n|> Enum.map(fn {symbol, index} -> %{integer: \"#{index}\", hexadecimal: symbol} end)\n|> Enum.take(-10)\n|> Kino.DataTable.new()","title":"Hexadecimal"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"\"0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f\"\n|> String.split(\",\")\n|> Enum.with_index()\n|> Enum.map(fn {symbol, index} -> %{integer: \"#{index}\", hexadecimal: symbol} end)\n|> Enum.take(-10)\n|> Kino.DataTable.new()","title":"Hexadecimal"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f"
@@ -316,7 +316,7 @@ Use hexadecimal `0x` syntax to represent the number `15`.
 </details>
 
 ```elixir
-
+0xF
 ```
 
 ## Bitstrings
@@ -416,7 +416,9 @@ Convert the alphabet `"abcdefghijklmnopqrstuvwxyz"` to a charlist, then inspect 
 </details>
 
 ```elixir
-
+"abcdefghijklmnopqrstuvwxyz"
+|> String.to_charlist()
+|> IO.inspect(charlists: :as_lists)
 ```
 
 ## Further Reading
@@ -427,7 +429,7 @@ Consider the following resource(s) to deepen your understanding of the topic.
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"strings_and_binaries_reading\"\n    \"exercises\" -> \"strings_and_binaries_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"strings_and_binaries_reading\"\n    \"exercises\" -> \"strings_and_binaries_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
