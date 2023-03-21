@@ -142,16 +142,41 @@ defmodule Rollable do
     "Ice Shard: deal [12d4](https://www.google.com/search?q=roll+12d4) ice damage."
   """
   def replace(string) do
+    dice_expression = dice_expression(string)
+
+    replace_dice_expression(
+      "[#{dice_expression}](https://www.google.com/search?q=roll+#{dice_expression})",
+      string
+    )
   end
 
   def roll(string) do
+    [number_of_dice, number_of_sides] =
+      Regex.split(~r/d/, dice_expression(string))
+      |> Enum.map(fn string -> String.to_integer(string) end)
+
+    1..number_of_dice
+    |> Enum.map(fn _ -> Enum.random(1..number_of_sides) end)
+    |> Enum.sum()
+    |> Integer.to_string()
+    |> replace_dice_expression(string)
+  end
+
+  defp dice_expression(string) do
+    Regex.scan(~r/\d+d\d+/, string)
+    |> List.first()
+    |> List.first()
+  end
+
+  defp replace_dice_expression(replacing_string, target_string) do
+    String.replace(target_string, ~r/\d+d\d+/, replacing_string)
   end
 end
 ```
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rollable_expressions_reading\"\n    \"exercises\" -> \"rollable_expressions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"rollable_expressions_reading\"\n    \"exercises\" -> \"rollable_expressions_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
