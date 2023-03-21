@@ -88,6 +88,12 @@ defmodule WeightedVoting do
     40
   """
   def count(votes, vote_to_count) do
+    Enum.reduce(votes, 0, fn {vote_name, vote_count}, acc_count ->
+      case vote_name do
+        ^vote_to_count -> acc_count + vote_count
+        _ -> acc_count
+      end
+    end)
   end
 
   @doc """
@@ -106,6 +112,15 @@ defmodule WeightedVoting do
     [birds: 20, cats: 30, dogs: 30]
   """
   def tally(votes) do
+    Enum.reduce(votes, votes, fn {vote_name, _vote_count}, acc_tally ->
+      Keyword.update!(acc_tally, vote_name, fn _ -> count(votes, vote_name) end)
+    end)
+  end
+
+  def tally_map(votes) do
+    Enum.reduce(votes, %{}, fn {vote_name, _vote_count}, acc_tally ->
+      Map.put_new(acc_tally, vote_name, count(votes, vote_name))
+    end)
   end
 end
 ```
@@ -137,7 +152,7 @@ You may copy the following code into the `WeightedVoting` module above to get st
 
 ## Mark As Completed
 
-<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"weighted_voting_reading\"\n    \"exercises\" -> \"weighted_voting_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"chunks":null,"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
+<!-- livebook:{"attrs":{"source":"file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, \"\"), \".livemd\")\n\nsave_name =\n  case Path.basename(__DIR__) do\n    \"reading\" -> \"weighted_voting_reading\"\n    \"exercises\" -> \"weighted_voting_exercise\"\n  end\n\nprogress_path = __DIR__ <> \"/../progress.json\"\nexisting_progress = File.read!(progress_path) |> Jason.decode!()\n\ndefault = Map.get(existing_progress, save_name, false)\n\nform =\n  Kino.Control.form(\n    [\n      completed: input = Kino.Input.checkbox(\"Mark As Completed\", default: default)\n    ],\n    report_changes: true\n  )\n\nTask.async(fn ->\n  for %{data: %{completed: completed}} <- Kino.Control.stream(form) do\n    File.write!(\n      progress_path,\n      Jason.encode!(Map.put(existing_progress, save_name, completed), pretty: true)\n    )\n  end\nend)\n\nform","title":"Track Your Progress"},"kind":"Elixir.HiddenCell","livebook_object":"smart_cell"} -->
 
 ```elixir
 file_name = Path.basename(Regex.replace(~r/#.+/, __ENV__.file, ""), ".livemd")
